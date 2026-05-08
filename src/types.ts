@@ -12,7 +12,10 @@ export interface Transaction {
   amount: number;
   category: string;
   subCategory?: string;
-  account: string;
+  /** Account['id'] de origen (ej. 'bi', 'bac', 'cash'). */
+  accountId: string;
+  /** Account['id'] de destino. Solo para type === 'transfer'. */
+  accountToId?: string;
   method: string;
   type: TransactionType;
   isNecessary: boolean;

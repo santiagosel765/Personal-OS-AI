@@ -88,41 +88,61 @@ export const MOCK_EVENTS: AppEvent[] = [
   },
 ];
 
+/**
+ * Proyecciones financieras del usuario para el "Disponible Real".
+ * Ver docs/FINANCIAL_CONTEXT.md §3.1.
+ *
+ *   Disponible Real = Σ cuentas available
+ *                   + pendingIncome      (próximo salario parcial 15-mayo)
+ *                   + pendingReceivables (préstamo a un amigo, paga el 15)
+ *                   − pendingExpenses    (internet pendiente)
+ *
+ * Con los saldos actuales (BI 1700 + BAC 1000 + cash 0):
+ *   2700 + 2400 + 600 − 500 = Q5,200.
+ */
+export const MOCK_PROJECTIONS = {
+  pendingIncome: 2400,
+  pendingReceivables: 600,
+  pendingExpenses: 500,
+  weeklyBudgetTarget: 1000,
+  nextIncomeDateISO: '2026-05-15',
+} as const;
+
 export const MOCK_TRANSACTIONS: Transaction[] = [
-  { 
-    id: 't1', 
-    date: '2026-05-07', 
-    description: 'Cena Restaurante', 
-    amount: 300, 
-    category: 'Comida', 
-    subCategory: 'Cena', 
-    account: 'BI', 
-    method: 'Efectivo', 
-    type: 'expense', 
+  {
+    id: 't1',
+    date: '2026-05-07',
+    description: 'Cena Restaurante',
+    amount: 300,
+    category: 'Comida',
+    subCategory: 'Cena',
+    accountId: 'bi',
+    method: 'Efectivo',
+    type: 'expense',
     isNecessary: false,
     relatedEventId: 'cena_rest'
   },
-  { 
-    id: 't2', 
-    date: '2026-05-07', 
-    description: 'Internet', 
-    amount: 500, 
-    category: 'Servicios', 
-    account: 'BI', 
-    method: 'Transferencia', 
-    type: 'expense', 
-    isNecessary: true 
+  {
+    id: 't2',
+    date: '2026-05-07',
+    description: 'Internet',
+    amount: 500,
+    category: 'Servicios',
+    accountId: 'bi',
+    method: 'Transferencia',
+    type: 'expense',
+    isNecessary: true
   },
-  { 
-    id: 't3', 
-    date: '2026-05-07', 
-    description: 'Almuerzo efectivo BI', 
-    amount: 28, 
-    category: 'Comida', 
-    subCategory: 'Almuerzo', 
-    account: 'BI', 
-    method: 'Efectivo', 
-    type: 'expense', 
-    isNecessary: true 
+  {
+    id: 't3',
+    date: '2026-05-07',
+    description: 'Almuerzo efectivo BI',
+    amount: 28,
+    category: 'Comida',
+    subCategory: 'Almuerzo',
+    accountId: 'bi',
+    method: 'Efectivo',
+    type: 'expense',
+    isNecessary: true
   }
 ];
