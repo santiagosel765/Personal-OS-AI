@@ -7,12 +7,16 @@ import React from 'react';
 import { Plus, ArrowLeftRight, Wallet, ShieldCheck, Heart, Landmark } from 'lucide-react';
 import { motion } from 'motion/react';
 import { MOCK_ACCOUNTS } from '../mockData';
+import { formatQ, sumByType } from '../lib/finance';
 
 interface AccountsViewProps {
   onAccountClick: (id: string) => void;
 }
 
 export default function AccountsView({ onAccountClick }: AccountsViewProps) {
+  const disponibleEnCuentas = sumByType(MOCK_ACCOUNTS, 'available');
+  const reservado = sumByType(MOCK_ACCOUNTS, 'reserved');
+
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'available': return 'Disponible';
@@ -81,8 +85,13 @@ export default function AccountsView({ onAccountClick }: AccountsViewProps) {
         Registrar Transferencia
       </button>
 
-      <div className="bg-gray-100 p-6 rounded-3xl border border-gray-200 border-dashed text-center">
-        <span className="text-sm font-bold text-gray-400">Total Capital Real: <span className="text-gray-600">Q7,000.00</span></span>
+      <div className="bg-gray-100 p-6 rounded-3xl border border-gray-200 border-dashed flex flex-col gap-2 text-center">
+        <span className="text-sm font-bold text-gray-400">
+          Disponible en cuentas: <span className="text-gray-600">{formatQ(disponibleEnCuentas)}</span>
+        </span>
+        <span className="text-[11px] font-bold text-amber-600 uppercase tracking-widest">
+          Reservado: {formatQ(reservado)} · No tocar
+        </span>
       </div>
     </div>
   );
