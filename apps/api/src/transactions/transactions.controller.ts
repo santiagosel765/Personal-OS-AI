@@ -17,6 +17,11 @@ export class TransactionsController {
       where: { userId },
       orderBy: { date: 'desc' },
       take,
+      include: {
+        account: { select: { id: true, name: true, bank: true } },
+        accountTo: { select: { id: true, name: true, bank: true } },
+        category: { select: { id: true, name: true, type: true } },
+      },
     });
   }
 }

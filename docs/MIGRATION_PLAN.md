@@ -265,3 +265,11 @@ Se planifican cuando llegue el momento, siguiendo [`ROADMAP.md`](./ROADMAP.md).
 - **Documentar la decisión** en el doc correspondiente al cerrar la fase.
 - **Testar manualmente** la app después de cada fase grande (especialmente UI mobile).
 - Si una fase descubre que la siguiente debe cambiar, **actualizar este plan** antes de continuar.
+
+---
+
+## Nota de avance 2026-05-08
+
+- Se consolido una fase intermedia sobre `feat/update-project`: App Shell real en `apps/web`, navegacion mobile/desktop y pantallas de lectura conectadas a API real para dashboard, cuentas, transacciones, tarjetas, deudas, metas y eventos.
+- Se decidio mantener las pantallas como server-rendered con `fetch` central en `apps/web/src/lib/api.ts`, porque hoy no hay auth ni mutaciones y reduce estado cliente innecesario.
+- La siguiente fase recomendada es creacion real de transacciones y transferencias con confirmacion antes de persistir.
