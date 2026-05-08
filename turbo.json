@@ -1,0 +1,31 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env"],
+  "globalEnv": [
+    "DATABASE_URL",
+    "API_PORT",
+    "FRONTEND_URL",
+    "NODE_ENV",
+    "JWT_SECRET",
+    "JWT_REFRESH_SECRET",
+    "ANTHROPIC_API_KEY",
+    "GEMINI_API_KEY",
+    "NEXT_PUBLIC_API_URL"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "generate": {
+      "cache": false
+    }
+  }
+}
