@@ -89,6 +89,21 @@ export interface TransactionDTO {
   isImpulsive: boolean | null;
   classifiedByAi: boolean;
   notes: string | null;
+  account?: {
+    id: string;
+    name: string;
+    bank: string | null;
+  };
+  accountTo?: {
+    id: string;
+    name: string;
+    bank: string | null;
+  } | null;
+  category?: {
+    id: string;
+    name: string;
+    type: string;
+  } | null;
 }
 
 export interface EventDTO {
