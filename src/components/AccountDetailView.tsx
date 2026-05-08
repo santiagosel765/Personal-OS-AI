@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { MOCK_ACCOUNTS, MOCK_TRANSACTIONS } from '../mockData';
+import { sumExpensesByAccount, sumIncomesByAccount } from '../lib/finance';
 
 interface AccountDetailViewProps {
   accountId: string;
@@ -23,17 +24,14 @@ interface AccountDetailViewProps {
 
 export default function AccountDetailView({ accountId, onBack }: AccountDetailViewProps) {
   const account = MOCK_ACCOUNTS.find(a => a.id === accountId);
-  const transactions = MOCK_TRANSACTIONS.filter(t => t.account === accountId || (t.account.includes(account?.name || '')));
+  const transactions = MOCK_TRANSACTIONS.filter(
+    t => t.accountId === accountId || t.accountToId === accountId
+  );
 
   if (!account) return <div>Cuenta no encontrada</div>;
 
-  const totalExpenses = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((acc, curr) => acc + curr.amount, 0);
-
-  const totalIncomes = transactions
-    .filter(t => t.type === 'income')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+  const totalExpenses = sumExpensesByAccount(MOCK_TRANSACTIONS, accountId);
+  const totalIncomes = sumIncomesByAccount(MOCK_TRANSACTIONS, accountId);
 
   return (
     <div className="flex flex-col min-h-full">

@@ -4,12 +4,12 @@
  */
 
 import React from 'react';
-import { 
-  TrendingUp, 
-  Wallet, 
-  Calendar, 
-  AlertCircle, 
-  ArrowUpRight, 
+import {
+  TrendingUp,
+  Wallet,
+  Calendar,
+  AlertCircle,
+  ArrowUpRight,
   ArrowDownRight,
   ShieldCheck,
   Zap,
@@ -17,6 +17,15 @@ import {
   CalendarDays
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { MOCK_ACCOUNTS, MOCK_DEBTS, MOCK_PROJECTIONS, MOCK_TRANSACTIONS } from '../mockData';
+import {
+  computeAvailableReal,
+  computeMonthlyDebtTotal,
+  computeReserved,
+  formatQ,
+  weeklyBudgetProgress,
+} from '../lib/finance';
+import { formatLongDateEs, formatShortDateEs, getToday } from '../lib/date';
 
 interface MetricCardProps {
   title: string;
@@ -52,18 +61,28 @@ const MetricCard = ({ title, value, subtitle, icon, trend, colorClass, onClick }
 );
 
 export default function Dashboard({ onNavigate }: { onNavigate: (view: any) => void }) {
-  const budgetProgress = 68; // Example: 680 spent out of 1000
+  const today = getToday();
+  const todayLabel = formatLongDateEs(today);
+
+  const disponibleReal = computeAvailableReal(MOCK_ACCOUNTS, MOCK_PROJECTIONS);
+  const reservado = computeReserved(MOCK_ACCOUNTS);
+  const deudaMensual = computeMonthlyDebtTotal(MOCK_DEBTS);
+  const proximoIngreso = MOCK_PROJECTIONS.pendingIncome;
+  const proximoIngresoLabel = formatShortDateEs(new Date(`${MOCK_PROJECTIONS.nextIncomeDateISO}T00:00:00`));
+
+  const budget = weeklyBudgetProgress(MOCK_TRANSACTIONS, MOCK_PROJECTIONS.weeklyBudgetTarget, today);
+  const remainingPercent = Math.max(0, 100 - budget.percent);
 
   return (
     <div className="p-4 flex flex-col gap-6">
       {/* Saludo y Fecha */}
       <div className="flex flex-col mt-2">
-        <span className="text-sm font-medium text-gray-400">Jueves, 7 de mayo de 2026</span>
+        <span className="text-sm font-medium text-gray-400">{todayLabel}</span>
         <h2 className="text-2xl font-bold text-gray-900 leading-tight">Hola, Personal OS AI 👋</h2>
       </div>
 
       {/* Main Alert */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-amber-50 border border-amber-100 p-4 rounded-3xl flex gap-3 items-start"
@@ -74,42 +93,42 @@ export default function Dashboard({ onNavigate }: { onNavigate: (view: any) => v
         <div className="flex flex-col gap-1">
           <span className="text-sm font-bold text-amber-900">Alerta de Riesgo: Medio</span>
           <p className="text-xs text-amber-800 leading-relaxed">
-            Te quedan **Q5,200** hasta el 29 de mayo. Mantén el ritmo de recuperación. No tocar Q4,300 reservados.
+            Te quedan <span className="font-bold">{formatQ(disponibleReal)}</span> hasta el 29 de mayo. Mantén el ritmo de recuperación. No tocar {formatQ(reservado)} reservados.
           </p>
         </div>
       </motion.div>
 
       {/* Primary Metrics Grid */}
       <div className="grid grid-cols-2 gap-3">
-        <MetricCard 
-          title="Disponible Real" 
-          value="Q5,200.00" 
+        <MetricCard
+          title="Disponible Real"
+          value={formatQ(disponibleReal)}
           subtitle="Hasta el 29 de mayo"
-          icon={<Wallet className="w-5 h-5" />} 
+          icon={<Wallet className="w-5 h-5" />}
           colorClass="bg-blue-600"
           onClick={() => onNavigate('accounts')}
         />
-        <MetricCard 
-          title="Reservado" 
-          value="Q4,300.00" 
+        <MetricCard
+          title="Reservado"
+          value={formatQ(reservado)}
           subtitle="BAM Oro Financiamientos"
-          icon={<ShieldCheck className="w-5 h-5" />} 
+          icon={<ShieldCheck className="w-5 h-5" />}
           colorClass="bg-amber-500"
           onClick={() => onNavigate('accounts')}
         />
-        <MetricCard 
-          title="Deuda Mensual" 
-          value="Q5,601.96" 
+        <MetricCard
+          title="Deuda Mensual"
+          value={formatQ(deudaMensual)}
           subtitle="Fijo e Inevitable"
-          icon={<Zap className="w-5 h-5" />} 
+          icon={<Zap className="w-5 h-5" />}
           colorClass="bg-rose-500"
           onClick={() => onNavigate('debts')}
         />
-        <MetricCard 
-          title="Próximo Ingreso" 
-          value="Q2,400.00" 
-          subtitle="15 de Mayo"
-          icon={<Calendar className="w-5 h-5" />} 
+        <MetricCard
+          title="Próximo Ingreso"
+          value={formatQ(proximoIngreso)}
+          subtitle={proximoIngresoLabel}
+          icon={<Calendar className="w-5 h-5" />}
           colorClass="bg-emerald-500"
         />
       </div>
@@ -119,24 +138,24 @@ export default function Dashboard({ onNavigate }: { onNavigate: (view: any) => v
         <div className="flex justify-between items-end">
           <div className="flex flex-col">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Presupuesto Semanal</span>
-            <span className="text-2xl font-black text-gray-900">Q680.00 <span className="text-sm font-normal text-gray-400">/ Q1,000</span></span>
+            <span className="text-2xl font-black text-gray-900">{formatQ(budget.spent)} <span className="text-sm font-normal text-gray-400">/ {formatQ(budget.target, 0)}</span></span>
           </div>
-          <div className={`px-2 py-1 rounded-lg text-[10px] font-bold ${budgetProgress > 90 ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
-            {100 - budgetProgress}% Restante
+          <div className={`px-2 py-1 rounded-lg text-[10px] font-bold ${budget.percent > 90 ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
+            {remainingPercent}% Restante
           </div>
         </div>
-        
+
         <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-          <motion.div 
+          <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${budgetProgress}%` }}
+            animate={{ width: `${Math.min(100, budget.percent)}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className={`h-full rounded-full ${budgetProgress > 90 ? 'bg-rose-500' : budgetProgress > 70 ? 'bg-amber-500' : 'bg-blue-600'}`}
+            className={`h-full rounded-full ${budget.percent > 90 ? 'bg-rose-500' : budget.percent > 70 ? 'bg-amber-500' : 'bg-blue-600'}`}
           />
         </div>
 
         <p className="text-[11px] text-gray-500 leading-relaxed font-medium">
-          Vas bien. Has gastado el <span className="font-bold text-gray-700">{budgetProgress}%</span> de tu meta semanal. Evita salidas no planificadas hoy.
+          Vas bien. Has gastado el <span className="font-bold text-gray-700">{budget.percent}%</span> de tu meta semanal. Evita salidas no planificadas hoy.
         </p>
       </div>
 
